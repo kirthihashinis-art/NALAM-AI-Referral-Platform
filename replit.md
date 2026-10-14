@@ -1,15 +1,16 @@
-# [Project name]
+# NALAM AI
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+NALAM AI coordinates referrals and follow-up visits between community health workers and care facilities.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/nalam-ai run dev` — run the Vite web app
+- `pnpm --filter @workspace/api-server run dev` — run the Express API server
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required services/secrets: PostgreSQL (`DATABASE_URL`), Clerk authentication, and `OPENAI_API_KEY` for the assistant
 
 ## Stack
 
@@ -22,23 +23,32 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/nalam-ai` — bilingual React/Vite web application and visual theme
+- `artifacts/api-server/src/routes/nalam.ts` — authenticated referral, patient, facility, follow-up, reporting, team, and assistant API
+- `lib/api-spec/openapi.yaml` — source of truth for the API contract and generated client
+- `lib/db/src/schema/nalam.ts` — PostgreSQL schema for NALAM data
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Clerk authenticates users; application roles and facility assignments are stored in PostgreSQL and checked by the API.
+- The first authenticated account becomes the initial administrator; later sign-ups stay pending until assigned. Register the owner account before sharing the app, and add invite-only enrollment before using it for an organization.
+- OpenAI requests are made only from the API server using the workspace secret. The assistant is restricted to the referral workflow and must not receive patient details.
+- Seeded records are fictional. Do not enter real patient information until privacy, security, access controls, retention, and legal requirements have been independently reviewed.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Role-scoped patient and referral records, searchable referrals with status/facility/date filters, facility directory, follow-up scheduling, and saved-record reports.
+- English and Tamil navigation and core referral workflow labels.
+- The public assistant explains NALAM workflows; it is not a clinical decision tool and does not provide general medical advice.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Keep the visual style futuristic but calm, with minimal animation.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Keep OpenAPI definitions and generated client/Zod schemas in sync by running codegen after contract changes.
+- Use the managed API and web workflows for preview checks; never weaken authentication to make signed-in UI screenshots easier.
 
 ## Pointers
 

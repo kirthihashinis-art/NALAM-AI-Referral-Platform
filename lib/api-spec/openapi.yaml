@@ -1,15 +1,28 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: NALAM AI referral coordination platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: Authenticated user and access management
+  - name: dashboard
+    description: Referral overview and analytics
+  - name: patients
+    description: Patient directory
+  - name: referrals
+    description: Patient referral coordination
+  - name: facilities
+    description: PHC and hospital directory
+  - name: followups
+    description: Patient follow-up scheduling
+  - name: assistant
+    description: Bilingual platform guidance
 paths:
   /healthz:
     get:
@@ -24,6 +37,367 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /me:
+    get:
+      operationId: getCurrentUser
+      tags: [users]
+      summary: Get the signed-in user's NALAM profile and role
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppUser"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List users for administrators
+      responses:
+        "200":
+          description: User directory
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppUser"
+  /users/{id}/role:
+    patch:
+      operationId: updateUserRole
+      tags: [users]
+      summary: Set a user's role and facility
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRoleInput"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppUser"
+        "400":
+          description: Invalid role or facility
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get referral totals and facility-level statistics
+      responses:
+        "200":
+          description: Dashboard analytics derived from saved records
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /patients:
+    get:
+      operationId: listPatients
+      tags: [patients]
+      summary: Search patients accessible to the signed-in user
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Patient directory
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Patient"
+  /referrals:
+    get:
+      operationId: listReferrals
+      tags: [referrals]
+      summary: Search and filter referrals
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/ReferralStatus"
+        - name: facilityId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: dateFrom
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Matching referrals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Referral"
+    post:
+      operationId: createReferral
+      tags: [referrals]
+      summary: Create a referral and save or update the patient record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReferralInput"
+      responses:
+        "201":
+          description: Created referral
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Referral"
+        "400":
+          description: Invalid referral
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /referrals/{id}/status:
+    patch:
+      operationId: updateReferralStatus
+      tags: [referrals]
+      summary: Update a referral status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReferralStatusInput"
+      responses:
+        "200":
+          description: Updated referral
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Referral"
+        "403":
+          description: Facility staff access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Referral not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /facilities:
+    get:
+      operationId: listFacilities
+      tags: [facilities]
+      summary: List available PHCs and hospitals
+      responses:
+        "200":
+          description: Facility directory
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Facility"
+    post:
+      operationId: createFacility
+      tags: [facilities]
+      summary: Add a PHC or hospital
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FacilityInput"
+      responses:
+        "201":
+          description: Created facility
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Facility"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /facilities/{id}:
+    patch:
+      operationId: updateFacility
+      tags: [facilities]
+      summary: Update facility information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FacilityUpdate"
+      responses:
+        "200":
+          description: Updated facility
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Facility"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /followups:
+    get:
+      operationId: listFollowups
+      tags: [followups]
+      summary: List scheduled follow-ups
+      parameters:
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [upcoming, overdue, completed, all]
+      responses:
+        "200":
+          description: Follow-ups accessible to the signed-in user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FollowUp"
+    post:
+      operationId: createFollowup
+      tags: [followups]
+      summary: Schedule a patient follow-up
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FollowUpInput"
+      responses:
+        "201":
+          description: Created follow-up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FollowUp"
+  /followups/{id}:
+    patch:
+      operationId: updateFollowup
+      tags: [followups]
+      summary: Update a scheduled follow-up
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FollowUpUpdate"
+      responses:
+        "200":
+          description: Updated follow-up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FollowUp"
+        "404":
+          description: Follow-up not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /assistant/replies:
+    post:
+      operationId: getAssistantReply
+      tags: [assistant]
+      summary: Answer platform-use questions in English or Tamil
+      description: Does not accept patient information and must not provide diagnosis, treatment, or medication advice.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssistantQuestion"
+      responses:
+        "200":
+          description: Assistant reply and scope label
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssistantReply"
+        "429":
+          description: Rate limit reached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +407,280 @@ components:
           type: string
       required:
         - status
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    UserRole:
+      type: string
+      enum: [administrator, health_worker, facility_staff, pending]
+    AppUser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: "#/components/schemas/UserRole"
+        facilityId:
+          type: [integer, "null"]
+        facilityName:
+          type: [string, "null"]
+      required: [id, name, email, role, facilityId, facilityName]
+    UserRoleInput:
+      type: object
+      properties:
+        role:
+          $ref: "#/components/schemas/UserRole"
+        facilityId:
+          type: [integer, "null"]
+      required: [role, facilityId]
+    ReferralStatus:
+      type: string
+      enum: [pending, in_progress, completed]
+    Patient:
+      type: object
+      properties:
+        patientId:
+          type: string
+        name:
+          type: string
+        age:
+          type: integer
+        contactNumber:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [patientId, name, age, contactNumber, createdAt]
+    Referral:
+      type: object
+      properties:
+        id:
+          type: integer
+        patientId:
+          type: string
+        patientName:
+          type: string
+        patientAge:
+          type: integer
+        contactNumber:
+          type: string
+        facilityId:
+          type: integer
+        facilityName:
+          type: string
+        referralDate:
+          type: string
+          format: date
+        reason:
+          type: string
+        status:
+          $ref: "#/components/schemas/ReferralStatus"
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        [id, patientId, patientName, patientAge, contactNumber, facilityId, facilityName, referralDate, reason, status, createdAt]
+    ReferralInput:
+      type: object
+      properties:
+        patientId:
+          type: string
+          minLength: 1
+          maxLength: 32
+        patientName:
+          type: string
+          minLength: 1
+          maxLength: 140
+        age:
+          type: integer
+          minimum: 0
+          maximum: 120
+        contactNumber:
+          type: string
+          minLength: 7
+          maxLength: 18
+        facilityId:
+          type: integer
+        referralDate:
+          type: string
+          format: date
+        reason:
+          type: string
+          minLength: 2
+          maxLength: 1000
+      required: [patientId, patientName, age, contactNumber, facilityId, referralDate, reason]
+    ReferralStatusInput:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ReferralStatus"
+      required: [status]
+    Facility:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        kind:
+          type: string
+          enum: [PHC, Hospital]
+        district:
+          type: string
+        address:
+          type: string
+        contactNumber:
+          type: string
+        active:
+          type: boolean
+      required: [id, name, kind, district, address, contactNumber, active]
+    FacilityInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+        kind:
+          type: string
+          enum: [PHC, Hospital]
+        district:
+          type: string
+        address:
+          type: string
+        contactNumber:
+          type: string
+      required: [name, kind, district, address, contactNumber]
+    FacilityUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+        kind:
+          type: string
+          enum: [PHC, Hospital]
+        district:
+          type: string
+        address:
+          type: string
+        contactNumber:
+          type: string
+        active:
+          type: boolean
+    FollowUp:
+      type: object
+      properties:
+        id:
+          type: integer
+        patientId:
+          type: string
+        patientName:
+          type: string
+        referralId:
+          type: [integer, "null"]
+        facilityId:
+          type: integer
+        facilityName:
+          type: string
+        followUpDate:
+          type: string
+          format: date
+        notes:
+          type: string
+        status:
+          type: string
+          enum: [scheduled, completed]
+        overdue:
+          type: boolean
+      required: [id, patientId, patientName, referralId, facilityId, facilityName, followUpDate, notes, status, overdue]
+    FollowUpInput:
+      type: object
+      properties:
+        patientId:
+          type: string
+          minLength: 1
+        referralId:
+          type: [integer, "null"]
+        facilityId:
+          type: integer
+        followUpDate:
+          type: string
+          format: date
+        notes:
+          type: string
+          maxLength: 1000
+      required: [patientId, referralId, facilityId, followUpDate, notes]
+    FollowUpUpdate:
+      type: object
+      properties:
+        followUpDate:
+          type: string
+          format: date
+        notes:
+          type: string
+          maxLength: 1000
+        status:
+          type: string
+          enum: [scheduled, completed]
+    FacilityStatistic:
+      type: object
+      properties:
+        facilityId:
+          type: integer
+        facilityName:
+          type: string
+        total:
+          type: integer
+        pending:
+          type: integer
+        inProgress:
+          type: integer
+        completed:
+          type: integer
+      required: [facilityId, facilityName, total, pending, inProgress, completed]
+    DashboardSummary:
+      type: object
+      properties:
+        total:
+          type: integer
+        pending:
+          type: integer
+        inProgress:
+          type: integer
+        completed:
+          type: integer
+        overdueFollowups:
+          type: integer
+        facilities:
+          type: array
+          items:
+            $ref: "#/components/schemas/FacilityStatistic"
+      required: [total, pending, inProgress, completed, overdueFollowups, facilities]
+    AssistantQuestion:
+      type: object
+      properties:
+        question:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        language:
+          type: string
+          enum: [en, ta]
+      required: [question, language]
+    AssistantReply:
+      type: object
+      properties:
+        answer:
+          type: string
+        scope:
+          type: string
+      required: [answer, scope]
 
