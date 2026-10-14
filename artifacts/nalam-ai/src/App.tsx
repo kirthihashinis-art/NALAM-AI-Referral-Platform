@@ -18,6 +18,7 @@ import {
   useUpdateFacility, useUpdateFollowup, useUpdateReferralStatus, useUpdateUserRole,
 } from '@workspace/api-client-react';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { HeroCarousel } from '@/components/hero-carousel';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
@@ -151,13 +152,13 @@ function Home() {
       <Link className="btn secondary small" href="/sign-in">{words.signIn}</Link><Link className="btn small" href="/sign-up">{words.createAccount}<ArrowRight size={15} /></Link>
     </div></header>
     <div className="public-wrap">
-      <section className="hero-grid" style={{ padding: '54px 0 80px' }}>
-        <div><div className="eyebrow">A clearer path from referral to care</div><h1 className="hero-title">Every referral.<br /><span>A next step.</span></h1>
+      <section className="hero-grid home-hero" style={{ padding: '30px 0 64px' }}>
+        <div className="home-hero-copy"><div className="eyebrow">A clearer path from referral to care</div><h1 className="hero-title">Every referral.<br /><span>A next step.</span></h1>
           <p style={{ fontSize: 18, lineHeight: 1.65, maxWidth: 540, color: '#526663' }}>NALAM helps community health workers and care teams keep referrals moving—with a named destination, a visible status and a follow-up that stays on the list.</p>
           <div style={{ display: 'flex', gap: 12, marginTop: 27, flexWrap: 'wrap' }}><Link className="btn" href="/sign-up">Join your care team<ArrowRight size={16} /></Link><Link className="btn secondary" href="/sign-in">Sign in to NALAM</Link></div>
           <p className="small-note" style={{ marginTop: 20, maxWidth: 470 }}><LockKeyhole size={13} style={{ verticalAlign: 'middle', marginRight: 6 }} />Preview records are fictional. Never enter real patient information during the demo. In a live service, patient details are only for authorized care coordination.</p>
         </div>
-        <div className="hero-orbit" aria-label="A connected care pathway illustration"><div className="orbit-core"><div style={{ textAlign: 'center' }}><HeartHandshake size={35} /><div style={{ fontSize: 11, marginTop: 8, fontWeight: 700 }}>CARE PATH</div></div></div><div className="hero-chip one">Community worker</div><div className="hero-chip two">Referral sent</div><div className="hero-chip three">PHC / hospital</div><div className="hero-chip four">Follow-up due</div></div>
+        <HeroCarousel language={language} />
       </section>
       <section className="grid-3 section-space">
         {[{ n: '01', t: 'Send with clarity', d: 'Capture the reason for referral and the intended care destination in one readable record.' }, { n: '02', t: 'Know who has it', d: 'See whether a referral is pending, in progress or completed—without chasing paper.' }, { n: '03', t: 'Keep the next visit visible', d: 'Schedule follow-ups and see overdue work before it gets lost in a busy day.' }].map(item => <article className="panel" style={{ padding: 23 }} key={item.n}><div className="eyebrow">{item.n} / THE WORKFLOW</div><h2 style={{ font: '700 20px var(--app-font-serif)', margin: '17px 0 8px' }}>{item.t}</h2><p className="muted" style={{ lineHeight: 1.65, fontSize: 14, margin: 0 }}>{item.d}</p></article>)}
