@@ -1,0 +1,100 @@
+Project: GramaSwasthya – Rural Healthcare Access Platform
+
+Improve my existing rural healthcare web application. Do not rebuild the project from scratch. First inspect the existing codebase, components, routes, database, and current API integrations. Preserve all working features and improve the UI, functionality, and API connectivity.
+
+1. Colour Palette and Theme Enhancement
+
+Use the following exact colour palette throughout the website:
+
+- Primary Healthcare Green: "#087F5B" — primary buttons, logo, navigation highlights, active states.
+- Soft Mint: "#DDF4E9" — cards, feature sections, subtle backgrounds.
+- Deep Teal: "#123B3A" — headings, footer, important text.
+- Off-white: "#F7FAF8" — main page background.
+- Trust Blue: "#2563EB" — links, informational elements, SMS actions.
+
+Design requirements:
+
+- Create a clean, modern, professional healthcare dashboard.
+- Use accessible typography with good contrast and readable font sizes.
+- Add subtle shadows, rounded cards, consistent spacing, and simple icons.
+- Use green for positive healthcare actions and blue for communication actions.
+- Improve the hero section, navigation bar, dashboard cards, patient details page, and responsive layouts.
+- Use a calm, trustworthy visual style suitable for rural users, including people with limited digital literacy.
+- Ensure the entire website works properly on mobile, tablet, and desktop.
+- Avoid excessive animations, clutter, and unnecessary gradients.
+
+2. API Key Integration
+
+Inspect the existing project and identify which external APIs are required.
+
+- Integrate the provided API key with the correct API service.
+- Store secret API keys in environment variables or the platform's secure secrets manager.
+- Never hardcode API keys in frontend code or expose them in browser requests.
+- If the API requires secret credentials, create a secure backend or serverless/Edge Function to handle requests.
+- Add loading states, error messages, retry handling, and appropriate API response validation.
+- Keep existing authentication, database connections, and working functionality intact.
+- Add an API connection status indicator for authorised administrators.
+- If no API key has been configured, show a clear setup message instead of pretending the integration works.
+- Do not invent API credentials or claim a successful connection without testing it.
+
+If the project uses Supabase, prefer Supabase Edge Functions and Supabase secrets where appropriate. Use the existing backend architecture if one is already configured.
+
+3. Patient Details Page — Two Action Options
+
+On the patient details card, implement two prominent side-by-side action buttons similar to the reference design.
+
+Option 1: Call Patient
+
+- Display a phone icon and the label “Call Patient”.
+- Use the patient's registered phone number.
+- On mobile, open the phone dialler using a properly encoded "tel:" link.
+- Validate that a phone number exists before enabling the action.
+- Do not claim that a call was completed automatically.
+
+Option 2: Send SMS
+
+- Display a message icon and the label “Send SMS”.
+- Open an SMS composer with the patient's registered number and an editable message.
+- Allow authorised healthcare staff to send appointment reminders, follow-up notifications, and referral updates.
+- If a genuine SMS provider API is configured, send messages securely through the backend.
+- Show sending, success, and failure states based on actual API responses.
+- If no SMS provider is configured, clearly indicate that SMS sending is not yet connected and provide a functional mobile SMS-composer fallback where supported.
+
+4. Patient Details Card
+
+Improve the patient details layout with:
+
+- Patient name and patient ID.
+- Referral status badge: Pending, Approved, or Completed.
+- Next follow-up date.
+- Healthcare centre information.
+- Call Patient and Send SMS actions.
+- A clear edit option for authorised users.
+- A patient activity timeline showing relevant referral and follow-up updates.
+
+Use fictional demo records only in demo mode. Clearly label demo data and do not mix it with real patient records.
+
+5. Functional Requirements
+
+- Make every visible button and navigation item functional.
+- Connect patient actions to the existing database and backend where appropriate.
+- Use proper authentication and role-based access control.
+- Protect sensitive patient information and restrict access to authorised staff.
+- Do not expose patient records or credentials in public API responses or logs.
+- Add form validation, empty states, loading indicators, and useful error messages.
+- Keep all existing pages and features working.
+- Do not replace real API integrations with hardcoded sample responses.
+
+6. Final Verification
+
+After implementing the changes:
+
+1. Verify the existing routes and navigation.
+2. Test API integration using the configured credentials.
+3. Test the Call Patient and Send SMS actions.
+4. Verify patient data is loaded from the correct source.
+5. Check mobile responsiveness and accessibility.
+6. Fix any console errors, broken imports, and runtime issues.
+7. Report which features are fully working and which still require API credentials or external service configuration.
+
+Important: Modify the existing project rather than creating a new one. Preserve the current healthcare workflow and use the specified colour palette consistently across all pages.
