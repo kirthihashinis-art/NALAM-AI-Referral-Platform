@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "NALAM AI"
+description = "A bilingual healthcare referral coordination platform for community health workers and facility staff, with referral tracking, follow-ups, analytics, and a clearly scoped guidance assistant."
+version = "1.0.0"
+id = "artifacts/nalam-ai"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20263
+
+[services.development]
+run = "pnpm --filter @workspace/nalam-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/nalam-ai", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/nalam-ai/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20263"
+BASE_PATH = "/"
