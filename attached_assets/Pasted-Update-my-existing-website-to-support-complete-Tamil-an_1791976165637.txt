@@ -1,0 +1,21 @@
+Update my existing website to support complete Tamil and English language switching across the entire application.
+
+When the user selects **Tamil (தமிழ்)**, the entire website must change to Tamil, including the navbar, sidebar, dashboard, headings, buttons, forms, input labels, placeholders, dropdowns, tables, notifications, error messages, success messages, popups, login page, registration page, admin panel, user profiles, and every other page and component.
+
+When the user selects **English**, the entire website must change back to English.
+
+Requirements:
+
+1. Implement a global language management system that controls the language of the entire website.
+2. Use centralized translation files such as `en.json` and `ta.json`, or an equivalent translation system suitable for the existing project.
+3. Replace all hardcoded user-facing text with translation keys throughout the existing codebase.
+4. Ensure all pages, components, modals, forms, alerts, validation messages, and dynamically generated text use the selected language.
+5. Use natural, accurate Tamil suitable for users in Tamil Nadu. Do not leave unnecessary English text when Tamil is selected.
+6. Save the selected language in localStorage so it remains selected after refreshing the page, navigating between pages, or logging in again.
+7. Update the entire interface immediately when the user changes the language, without requiring a page reload.
+8. Ensure the language selector works consistently on desktop and mobile and across all user roles.
+9. Preserve the existing website design, styling, responsiveness, features, backend logic, database, authentication, and API integrations.
+10. Do not translate internal code, API keys, database field names, or technical values that must remain unchanged.
+11. Audit the entire project for missing translations and hardcoded English text. Fix all missing translation keys and ensure every page works correctly in both languages.
+
+**Important:** Do not rebuild the website from scratch. Inspect my existing project and directly modify the necessary files. Do not only update the homepage or language selector. Implement complete website-wide Tamil and English support and test the full application in both languages before finishing.
